@@ -30,14 +30,22 @@ fi
 echo "deploy_sitename: ${deploy_sitename}"
 
 
-# Set site directory
+# Create directory structure
 declare -r site_dir="/root/sites/${deploy_sitename}"
-
-# Make directory structure
 mkdir -p "${site_dir}/database"
 mkdir -p "${site_dir}/source"
 mkdir -p "${site_dir}/static"
 mkdir -p "${site_dir}/virtualenv"
+
+
+# Get latest source
+declare -r source_dir="${site_dir}/source"
+if [ -e "${source_dir}/.git" ]; then
+    cd ${source_dir} && git fetch
+    cd ${source_dir} && git reset --hard
+else
+    git clone ${REPO_URL} ${source_dir}
+fi
 
 
 
