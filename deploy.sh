@@ -13,33 +13,38 @@ LIVING_PARAM="living"
 LIVING_SITENAME="superlists.site"
 
 
-# Set deploy sitename
+# Set sitename
 declare -r deploy_param=$1
 if [ "${deploy_param}" == "${STAGING_PARAM}" ]; then
-    declare -r deploy_sitename=${STAGING_SITENAME}
+    declare -r sitename=${STAGING_SITENAME}
 fi
 if [ "${deploy_param}" == "${LIVING_PARAM}" ]; then
-    declare -r deploy_sitename=${LIVING_SITENAME}
+    declare -r sitename=${LIVING_SITENAME}
 fi
 
-if [ ! -n "${deploy_sitename}" ]; then
+if [ ! -n "${sitename}" ]; then
     echo "usage:"
     echo "  deploy.sh staging|living"
     exit 1
 fi
-echo "deploy_sitename: ${deploy_sitename}"
+echo "sitename: ${sitename}"
 
 
 # Create directory structure
-declare -r site_dir="/root/sites/${deploy_sitename}"
-mkdir -p "${site_dir}/database"
-mkdir -p "${site_dir}/source"
-mkdir -p "${site_dir}/static"
-mkdir -p "${site_dir}/virtualenv"
+declare -r site_dir="/root/sites/${sitename}"
+
+declare -r database_dir="${site_dir}/database"
+declare -r source_dir="${site_dir}/source"
+declare -r static_dir="${site_dir}/static"
+declare -r virtualenv_dir="${site_dir}/virtualenv"
+
+mkdir -p "${database_dir}"
+mkdir -p "${source_dir}"
+mkdir -p "${static_dir}"
+mkdir -p "${virtualenv_dir}"
 
 
 # Get latest source
-declare -r source_dir="${site_dir}/source"
 if [ -e "${source_dir}/.git" ]; then
     cd ${source_dir} && git fetch
     cd ${source_dir} && git reset --hard
@@ -50,8 +55,10 @@ fi
 
 # Update settings
 declare -r temp_dir="/root/deploy_tools/template"
-cp -pf "${temp_dir}/settings.py" "${source_dir}/superlists/settings.py"
-sed -i "s/{SITENAME}/${deploy_sitename}/g" "${source_dir}/superlists/settings.py"
+declare -r dest_settings="${source_dir}/superlists/settings.py"
+
+cp -pf "${temp_dir}/settings.py" "${dest_settings}"
+sed -i "s/{SITENAME}/${sitename}/g" "${dest_settings}"
 # Update secret_key
 
 
