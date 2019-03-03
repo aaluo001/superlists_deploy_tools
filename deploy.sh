@@ -48,6 +48,13 @@ else
 fi
 
 
+# Update settings
+declare -r temp_dir="/root/deploy_tools/template"
+cp -pf "${temp_dir}/settings.py" "${source_dir}/superlists/settings.py"
+sed -i "s/{SITENAME}/${deploy_sitename}/g" "${source_dir}/superlists/settings.py"
+# Update secret_key
+
+
 
 exit 0
 
