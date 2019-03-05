@@ -24,7 +24,13 @@ case $1 in
         exit 1
         ;;
 esac
-echo "sitename: ${sitename}"
+
+
+# Start deploy
+#echo "===================="     >> ${log_file}
+echo "start deploy at: "`date`  >> ${log_file}
+echo "sitename: ${sitename}"    >> ${log_file}
+echo "===================="     >> ${log_file}
 
 
 # Create directory structure
@@ -101,5 +107,17 @@ if [ ! -L "${dest_nginx_ln}" ]; then
 fi
 
 
+# Config gunicorn systemd
+declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
+
+cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
+sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
+
+
+# End deploy
+echo "===================="  >> ${log_file}
+echo ""                      >> ${log_file}
+echo ""                      >> ${log_file}
+echo ""                      >> ${log_file}
 exit 0
 
