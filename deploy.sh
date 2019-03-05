@@ -31,7 +31,7 @@ esac
 # Start deploy
 echo "===================="     >> ${log_file}
 echo "deploy: ${sitename}"      >> ${log_file}
-`date`                          >> ${log_file}
+date                            >> ${log_file}
 echo "===================="     >> ${log_file}
 
 
