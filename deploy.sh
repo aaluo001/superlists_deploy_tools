@@ -13,10 +13,12 @@ declare -r log_file="/root/deploy_tools/logs/deploy_${date_str}.log"
 # Set sitename
 case $1 in
     staging)
-        declare -r sitename="tjw-superlists-staging.site"
+        declare -r sitename="www.tjw-superlists-staging.site"
+        declare -r icpno="19005354"
         ;;
     living)
-        declare -r sitename="superlists.site"
+        declare -r sitename="www.superlists.site"
+        declare -r icpno="99999999"
         ;;
     *)
         echo "usage:"
@@ -27,9 +29,9 @@ esac
 
 
 # Start deploy
-#echo "===================="     >> ${log_file}
-echo "start deploy at: "`date`  >> ${log_file}
-echo "sitename: ${sitename}"    >> ${log_file}
+echo "===================="     >> ${log_file}
+echo "deploy: ${sitename}"      >> ${log_file}
+`date`                          >> ${log_file}
 echo "===================="     >> ${log_file}
 
 
@@ -75,6 +77,11 @@ sed -i "s/{SITENAME}/${sitename}/g" "${dest_settings}"
 sed -i "s/{SECRET_KEY}/${secret_key}/g" "${dest_settings}"
 
 
+# Update base.html ICPNO
+declare -r dest_base_html="${source_dir}/lists/templates/base.html"
+sed -i "s/{ICPNO}/${icpno}/g" "${dest_base_html}"
+
+
 # Update virtualenv
 if [ ! -e "${virtualenv_dir}/bin/pip" ]; then
     python3.6 -m venv "${virtualenv_dir}"  >> ${log_file}
@@ -112,6 +119,13 @@ declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
 
 cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
 sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
+
+
+# Reload
+systemctl daemon-reload
+systemctl reload nginx
+systemctl enable ${sitename}
+systemctl start ${sitename}
 
 
 # End deploy
