@@ -53,8 +53,8 @@ mkdir -p "${virtualenv_dir}"
 
 # Get latest source
 if [ -e "${source_dir}/.git" ]; then
-    cd ${source_dir} && git fetch         >> ${log_file}
     cd ${source_dir} && git reset --hard  >> ${log_file}
+    cd ${source_dir} && git pull          >> ${log_file}
 else
     git clone ${REPO_URL} ${source_dir}   >> ${log_file}
 fi
@@ -64,6 +64,7 @@ fi
 declare -r secret_key_file="${keys_dir}/${sitename}"
 if [ ! -e "${secret_key_file}" ]; then
     date +%s | sha256sum | cut -c -64 > ${secret_key_file}
+    declare -r config_site="yes"
 fi
 declare -r secret_key=`cat ${secret_key_file}`
 
@@ -103,30 +104,39 @@ cd ${source_dir} && \
     >> ${log_file}
 
 
-# Config nginx
-declare -r dest_nginx_conf="/etc/nginx/sites-available/${sitename}"
-declare -r dest_nginx_ln="/etc/nginx/sites-enabled/${sitename}"
+# Config nginx and gunicorn-systemd
+if [ -n "${config_site}" ]; then
 
-cp -pf "${temp_dir}/nginx.conf" "${dest_nginx_conf}"
-sed -i "s/{SITENAME}/${sitename}/g" "${dest_nginx_conf}"
-if [ ! -L "${dest_nginx_ln}" ]; then
-    ln -s "${dest_nginx_conf}" "${dest_nginx_ln}"
+    # Config nginx
+    declare -r dest_nginx_conf="/etc/nginx/sites-available/${sitename}"
+    declare -r dest_nginx_ln="/etc/nginx/sites-enabled/${sitename}"
+
+    cp -pf "${temp_dir}/nginx.conf" "${dest_nginx_conf}"
+    sed -i "s/{SITENAME}/${sitename}/g" "${dest_nginx_conf}"
+    if [ ! -L "${dest_nginx_ln}" ]; then
+        ln -s "${dest_nginx_conf}" "${dest_nginx_ln}"
+    fi
+
+
+    # Config gunicorn-systemd
+    declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
+
+    cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
+    sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
+
+
+    # Reload nginx and start gunicorn service
+    systemctl daemon-reload
+    systemctl reload nginx
+    systemctl enable ${sitename}
+    systemctl start  ${sitename}
+
+else
+
+    # Restart gunicorn service
+    systemctl restart ${sitename}
+
 fi
-
-
-# Config gunicorn systemd
-declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
-
-cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
-sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
-
-
-# Reload
-systemctl daemon-reload
-systemctl reload nginx
-systemctl enable ${sitename}
-systemctl start ${sitename}
-
 
 # End deploy
 echo "===================="  >> ${log_file}
