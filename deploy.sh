@@ -1,11 +1,23 @@
 #!/bin/bash
 # deploy.sh
 # deploy for superlists by parameter 'staging' or 'living'
-# usage: deploy.sh staging|living
-# update: 2019-03-03 by tang-jianwei
+# usage: deploy.sh staging|living [-c]
+# update:
+#   2019-03-03 new file. by tang-jianwei
+#   2019-03-15 can set parameter [-c] to config nginx. by tang-jianwei
 
-REPO_URL="https://github.com/aaluo001/superlists.git"
 
+function display_usage_and_exit() {
+    echo "usage:"
+    echo "  deploy.sh staging|living [-c]"
+    echo "    * staging: deploy staging server"
+    echo "    *  living: deploy living server"
+    echo "    *      -c: need to config nginx"
+    exit 1     
+}
+
+
+declare -r repo_url="https://github.com/aaluo001/superlists.git"
 declare -r date_str=`date +%Y%m%d`
 declare -r log_file="/root/deploy_tools/logs/deploy_${date_str}.log"
 
@@ -14,18 +26,29 @@ declare -r log_file="/root/deploy_tools/logs/deploy_${date_str}.log"
 case $1 in
     staging)
         declare -r sitename="www.tjw-superlists-staging.site"
-        declare -r icpno="19005354"
         ;;
     living)
         declare -r sitename="www.superlists.site"
-        declare -r icpno="99999999"
         ;;
     *)
-        echo "usage:"
-        echo "  deploy.sh staging|living"
-        exit 1
+        display_usage_and_exit
         ;;
 esac
+
+
+# Set config_nginx
+shift
+while [ -n "$1" ]
+do
+    case $1 in
+        -c)
+            declare -r config_nginx="yes"
+            ;;
+        *)
+            display_usage_and_exit
+            ;;
+    esac
+done
 
 
 # Start deploy
@@ -56,7 +79,7 @@ if [ -e "${source_dir}/.git" ]; then
     cd ${source_dir} && git reset --hard  >> ${log_file}
     cd ${source_dir} && git pull          >> ${log_file}
 else
-    git clone ${REPO_URL} ${source_dir}   >> ${log_file}
+    git clone ${repo_url} ${source_dir}   >> ${log_file}
 fi
 
 
@@ -76,11 +99,6 @@ declare -r dest_settings="${source_dir}/superlists/settings.py"
 cp -pf "${temp_dir}/settings.py" "${dest_settings}"
 sed -i "s/{SITENAME}/${sitename}/g" "${dest_settings}"
 sed -i "s/{SECRET_KEY}/${secret_key}/g" "${dest_settings}"
-
-
-# Update base.html ICPNO
-declare -r dest_base_html="${source_dir}/lists/templates/base.html"
-sed -i "s/{ICPNO}/${icpno}/g" "${dest_base_html}"
 
 
 # Update virtualenv
@@ -104,10 +122,9 @@ cd ${source_dir} && \
     >> ${log_file}
 
 
-# Config nginx and gunicorn-systemd
-if [ -n "${config_site}" ]; then
+# Config nginx
+if [ -n "${config_site}" ] || [ -n "${config_nginx}" ]; then
 
-    # Config nginx
     declare -r dest_nginx_conf="/etc/nginx/sites-available/${sitename}"
     declare -r dest_nginx_ln="/etc/nginx/sites-enabled/${sitename}"
 
@@ -117,17 +134,22 @@ if [ -n "${config_site}" ]; then
         ln -s "${dest_nginx_conf}" "${dest_nginx_ln}"
     fi
 
+    # Reload nginx
+    systemctl reload nginx
 
-    # Config gunicorn-systemd
+fi
+
+
+# Config gunicorn-systemd
+if [ -n "${config_site}" ]; then
+
     declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
 
     cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
     sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
 
-
-    # Reload nginx and start gunicorn service
+    # Start gunicorn service
     systemctl daemon-reload
-    systemctl reload nginx
     systemctl enable ${sitename}
     systemctl start  ${sitename}
 
