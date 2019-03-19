@@ -1,18 +1,20 @@
 #!/bin/bash
 # deploy.sh
 # deploy for superlists by parameter 'staging' or 'living'
-# usage: deploy.sh staging|living [-c]
+# usage: deploy.sh staging|living [-c] [-g]
 # update:
 #   2019-03-03 new file. by tang-jianwei
 #   2019-03-15 can set parameter [-c] to config nginx. by tang-jianwei
+#   2019-03-19 can set parameter [-g] to config gunicorn. by tang-jianwei
 
 
 function display_usage_and_exit() {
     echo "usage:"
-    echo "  deploy.sh staging|living [-c]"
+    echo "  deploy.sh staging|living [-c] [-g]"
     echo "    * staging: deploy staging server"
     echo "    *  living: deploy living server"
     echo "    *      -c: need to config nginx"
+    echo "    *      -g: neet to config gunicorn-systemd"
     exit 1     
 }
 
@@ -36,7 +38,7 @@ case $1 in
 esac
 
 
-# Set config_nginx
+# Set config_nginx and config_gunicorn
 shift
 while [ -n "$1" ]
 do
@@ -44,10 +46,14 @@ do
         -c)
             declare -r config_nginx="yes"
             ;;
+        -g)
+            declare -r config_gunicorn="yes"
+            ;;
         *)
             display_usage_and_exit
             ;;
     esac
+    shift
 done
 
 
@@ -141,15 +147,21 @@ fi
 
 
 # Config gunicorn-systemd
-if [ -n "${config_site}" ]; then
+if [ -n "${config_site}" ] || [ -n "${config_gunicorn}" ]; then
 
     declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
 
     cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
     sed -i "s/{SITENAME}/${sitename}/g" "${dest_gunicorn_systemd}"
 
-    # Start gunicorn service
+    # Reload new gunicorn-systemd file
     systemctl daemon-reload
+
+fi
+
+if [ -n "${config_site}" ]; then
+
+    # Start gunicorn service
     systemctl enable ${sitename}
     systemctl start  ${sitename}
 
@@ -159,6 +171,7 @@ else
     systemctl restart ${sitename}
 
 fi
+
 
 # End deploy
 echo "===================="  >> ${log_file}
