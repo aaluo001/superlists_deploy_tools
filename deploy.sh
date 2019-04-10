@@ -72,12 +72,14 @@ declare -r database_dir="${site_dir}/database"
 declare -r source_dir="${site_dir}/source"
 declare -r static_dir="${site_dir}/static"
 declare -r virtualenv_dir="${site_dir}/virtualenv"
+declare -r log_dir="${site_dir}/log"
 
 mkdir -p "${keys_dir}"
 mkdir -p "${database_dir}"
 mkdir -p "${source_dir}"
 mkdir -p "${static_dir}"
 mkdir -p "${virtualenv_dir}"
+mkdir -p "${log_dir}"
 
 
 # Get latest source
