@@ -133,6 +133,7 @@ cd ${source_dir} && \
 # Config nginx
 if [ -n "${config_site}" ] || [ -n "${config_nginx}" ]; then
 
+    echo "configing nginx..."
     declare -r dest_nginx_conf="/etc/nginx/sites-available/${sitename}"
     declare -r dest_nginx_ln="/etc/nginx/sites-enabled/${sitename}"
 
@@ -151,6 +152,7 @@ fi
 # Config gunicorn-systemd
 if [ -n "${config_site}" ] || [ -n "${config_gunicorn}" ]; then
 
+    echo "configing gunicorn-systemd..."
     declare -r dest_gunicorn_systemd="/etc/systemd/system/${sitename}.service"
 
     cp -pf "${temp_dir}/gunicorn_systemd.service" "${dest_gunicorn_systemd}"
