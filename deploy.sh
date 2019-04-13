@@ -6,6 +6,7 @@
 #   2019-03-03 new file. by tang-jianwei
 #   2019-03-15 can set parameter [-c] to config nginx. by tang-jianwei
 #   2019-03-19 can set parameter [-g] to config gunicorn. by tang-jianwei
+#   2019-04-13 config email_password. by tang-jianwei
 
 
 function display_usage_and_exit() {
@@ -100,6 +101,15 @@ fi
 declare -r secret_key=`cat ${secret_key_file}`
 
 
+# Get email password
+declare -r email_password_file="${keys_dir}/email_password"
+if [ ! -e "${email_password_file}" ]; then
+    echo "no such file: ${email_password_file}"
+    exit 1
+fi
+declare -r email_password=`cat ${email_password_file}`
+
+
 # Update settings
 declare -r temp_dir="/root/deploy_tools/templates"
 declare -r dest_settings="${source_dir}/superlists/settings.py"
@@ -107,6 +117,7 @@ declare -r dest_settings="${source_dir}/superlists/settings.py"
 cp -pf "${temp_dir}/settings.py" "${dest_settings}"
 sed -i "s/{SITENAME}/${sitename}/g" "${dest_settings}"
 sed -i "s/{SECRET_KEY}/${secret_key}/g" "${dest_settings}"
+sed -i "s/{EMAIL_PASSWORD}/${email_password}/g" "${dest_settings}"
 
 
 # Update virtualenv

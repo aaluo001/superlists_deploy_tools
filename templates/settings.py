@@ -127,17 +127,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 
-# 解决模板文件中出现中文乱码的问题
+# Set file charset of templates
 FILE_CHARSET = 'gbk'
 
 
 # Set email
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_HOST_USER = 'superlists@163.com'
-#EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
-EMAIL_HOST_PASSWORD = 'superlists1234'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = {EMAIL_PASSWORD}
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
 
 
 # Set logging
