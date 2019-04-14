@@ -33,10 +33,15 @@ Ubuntu 16.04("Xenial/LTS")
 
 ## Ŀ¼�ṹ
 /root
+    /keys
+        staging.my-domain.com   # secret_key
+        living.my-domain.com    # secret_key
+        email_password          # send email's password
     /sites
         /{SITENAME}
             /database
             /source
             /static
             /virtualenv
+            /log
 
