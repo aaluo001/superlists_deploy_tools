@@ -33,10 +33,15 @@ Ubuntu 16.04("Xenial/LTS")
 
 ## Ŀ¼�ṹ
 /root
+    /deploy_tools
+        deploy.sh
     /keys
-        staging.my-domain.com   # secret_key
-        living.my-domain.com    # secret_key
-        email_password          # send email's password
+        www.tjw-superlists-staging.site   # secret_key
+        www.superlists.site    # secret_key
+    /shells
+        init_common.sh
+        init_staging.sh
+        init_living.sh
     /sites
         /{SITENAME}
             /database

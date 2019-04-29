@@ -4,9 +4,10 @@
 # usage: deploy.sh staging|living [-c] [-g]
 # update:
 #   2019-03-03 new file. by tang-jianwei
-#   2019-03-15 can set parameter [-c] to config nginx. by tang-jianwei
-#   2019-03-19 can set parameter [-g] to config gunicorn. by tang-jianwei
-#   2019-04-13 config email_password. by tang-jianwei
+#   2019-03-15 can set parameter [-c] to config nginx.
+#   2019-03-19 can set parameter [-g] to config gunicorn.
+#   2019-04-13 config email_password.
+#   2019-04-29 config db_name, db_user, db_password
 
 
 function display_usage_and_exit() {
@@ -23,15 +24,22 @@ function display_usage_and_exit() {
 declare -r repo_url="https://github.com/aaluo001/superlists.git"
 declare -r date_str=`date +%Y%m%d`
 declare -r log_file="/root/deploy_tools/logs/deploy_${date_str}.log"
+declare -r shells_dir="/root/shells"
+
+
+# Include common shell
+. ${shells_dir}/init_common.sh
 
 
 # Set sitename
 case $1 in
     staging)
         declare -r sitename="www.tjw-superlists-staging.site"
+        . ${shells_dir}/init_staging.sh
         ;;
     living)
         declare -r sitename="www.superlists.site"
+        . ${shells_dir}/init_living.sh
         ;;
     *)
         display_usage_and_exit
@@ -101,22 +109,17 @@ fi
 declare -r secret_key=`cat ${secret_key_file}`
 
 
-# Get email password
-declare -r email_password_file="${keys_dir}/email_password"
-if [ ! -e "${email_password_file}" ]; then
-    echo "no such file: ${email_password_file}"
-    exit 1
-fi
-declare -r email_password=`cat ${email_password_file}`
-
-
 # Update settings
 declare -r temp_dir="/root/deploy_tools/templates"
 declare -r dest_settings="${source_dir}/superlists/settings.py"
 
 cp -pf "${temp_dir}/settings.py" "${dest_settings}"
+
 sed -i "s/{SITENAME}/${sitename}/g" "${dest_settings}"
 sed -i "s/{SECRET_KEY}/${secret_key}/g" "${dest_settings}"
+sed -i "s/{DB_NAME}/${db_name}/g" "${dest_settings}"
+sed -i "s/{DB_USER}/${db_user}/g" "${dest_settings}"
+sed -i "s/{DB_PASSWORD}/${db_password}/g" "${dest_settings}"
 sed -i "s/{EMAIL_PASSWORD}/${email_password}/g" "${dest_settings}"
 
 
