@@ -137,9 +137,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 
-# Set file charset of templates
-FILE_CHARSET = 'gbk'
-
 
 # Set email
 EMAIL_HOST = 'smtp.163.com'

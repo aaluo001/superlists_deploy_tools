@@ -1,7 +1,7 @@
-ÅäÖÃÐÂÍøÕ¾
+é…ç½®æ–°ç½‘ç«™
 ====================
 
-## ÐèÒª°²×°µÄ°ü
+## éœ€è¦å®‰è£…çš„åŒ…
 
 * Nginx
 * Python3.6
@@ -13,25 +13,25 @@ Ubuntu 16.04("Xenial/LTS")
     apt-get install nginx git python3.6 python3.6-venv
 
 
-## ÅäÖÃNginx
+## é…ç½®Nginx
 
-* ²Î¿¼template_nginx.conf
-* °Ñ{SITENAME}Ìæ»»³ÉËùÐèµÄÓòÃû£¬Èçstaging.my-domain.com
+* å‚è€ƒtemplate_nginx.conf
+* æŠŠ{SITENAME}æ›¿æ¢æˆæ‰€éœ€çš„åŸŸåï¼Œå¦‚staging.my-domain.com
     cp -p ./template_nginx.conf > /etc/nginx/sites-available/staging.my-domain.com
-    # sed -i ÊÇÖ±½ÓÔÚÎÄ¼þÖÐÌæ»»£¬²»ÔÚÖÕ¶ËÊä³ö
+    # sed -i æ˜¯ç›´æŽ¥åœ¨æ–‡ä»¶ä¸­æ›¿æ¢ï¼Œä¸åœ¨ç»ˆç«¯è¾“å‡º
     sed -i "s/{SITENAME}/staging.my-domain.com/g" /etc/nginx/sites-available/staging.my-domain.com
     ln -s /etc/nginx/sites-available/staging.my-domain.com /etc/nginx/sites-enabled/staging.my-domain.com
     rm /etc/nginx/sites-enabled/default
 
 
-## Systemd·þÎñ
-* ²Î¿¼template_gunicorn-systemd.service
-* °Ñ{SITENAME}Ìæ»»³ÉËùÐèµÄÓòÃû£¬Èçstaging.my-domain.com
+## SystemdæœåŠ¡
+* å‚è€ƒtemplate_gunicorn-systemd.service
+* æŠŠ{SITENAME}æ›¿æ¢æˆæ‰€éœ€çš„åŸŸåï¼Œå¦‚staging.my-domain.com
     cp -p ./template_gunicorn-systemd.service > /etc/systemd/system/staging.my-domain.com.service
     sed -i "s/{SITENAME}/staging.my-domain.com/g" /etc/systemd/system/staging.my-domain.com.service
 
 
-## Ä¿Â¼½á¹¹
+## ç›®å½•ç»“æž„
 /root
     /deploy_tools
         deploy.sh

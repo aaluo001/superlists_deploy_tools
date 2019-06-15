@@ -1,25 +1,25 @@
 ====================
-## ²¿Êğ·şÎñÆ÷
+## éƒ¨ç½²æœåŠ¡å™¨
 ====================
 47.97.118.237
 root: ******
 
-# ·şÎñÆ÷²¿Êğ£¬ÒÔ¼°Éú²ú»·¾³Êı¾İ¿âÓÃ»§
+# æœåŠ¡å™¨éƒ¨ç½²ï¼Œä»¥åŠç”Ÿäº§ç¯å¢ƒæ•°æ®åº“ç”¨æˆ·
   superlists: ******
 
-# Êı¾İ¿â¹ÜÀíÔ±ÓÃ»§
+# æ•°æ®åº“ç®¡ç†å‘˜ç”¨æˆ·
   postgres: ******
 
 
 
-# ´´½¨²âÊÔÓÃ»§dev001
+# åˆ›å»ºæµ‹è¯•ç”¨æˆ·dev001
   CREATE ROLE dev001 LOGIN PASSWORD 'dev001#' CREATEDB;
   
-# ´´½¨ºÍÓÃ»§ÃûÍ¬ÃûµÄÊı¾İ¿â
+# åˆ›å»ºå’Œç”¨æˆ·ååŒåçš„æ•°æ®åº“
   CREATE DATABASE dev001 WITH OWNER = dev001;
 
 
-# ĞŞ¸Äsettings.py
+# ä¿®æ”¹settings.py
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -29,7 +29,7 @@ DATABASES = {
     }
 }
 
-# ´´½¨²âÊÔÓÃtable
+# åˆ›å»ºæµ‹è¯•ç”¨table
   python manage.py migrate
 
 
@@ -79,13 +79,13 @@ cp -p pg_hba.conf ./pg_hba.conf.20190424bak
 
 vi pg_hba.conf
 
-ĞŞ¸ÄÇ°£º
+ä¿®æ”¹å‰ï¼š
 #--------------------------------------------------------------------------------
 # "local" is for Unix domain socket connections only
 local   all             all                                     peer
 #--------------------------------------------------------------------------------
 
-ĞŞ¸Äºó£º
+ä¿®æ”¹åï¼š
 #--------------------------------------------------------------------------------
 # "local" is for Unix domain socket connections only
 local   all             all                                     md5    
