@@ -2,7 +2,6 @@
 ====================
 
 ## 需要安装的包
-
 * Nginx
 * Python3.6
 * Virtualenv + pip
@@ -14,7 +13,6 @@ Ubuntu 16.04("Xenial/LTS")
 
 
 ## 配置Nginx
-
 * 参考template_nginx.conf
 * 把{SITENAME}替换成所需的域名，如staging.my-domain.com
     cp -p ./template_nginx.conf > /etc/nginx/sites-available/staging.my-domain.com
@@ -29,6 +27,13 @@ Ubuntu 16.04("Xenial/LTS")
 * 把{SITENAME}替换成所需的域名，如staging.my-domain.com
     cp -p ./template_gunicorn-systemd.service > /etc/systemd/system/staging.my-domain.com.service
     sed -i "s/{SITENAME}/staging.my-domain.com/g" /etc/systemd/system/staging.my-domain.com.service
+
+
+## 为新发布打上Git标签
+git tag -f LIVE
+export TAG=`date +DEPLOY-%F/%H%M`
+git tag $TAG
+git push -f origin LIVE $TAG
 
 
 ## 目录结构
