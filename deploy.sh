@@ -8,6 +8,7 @@
 #   2019-03-19 can set parameter [-g] to config gunicorn.
 #   2019-04-13 config email_password.
 #   2019-04-29 config db_name, db_user, db_password
+#   2019-08-18 change python3.6 to python3
 
 
 function display_usage_and_exit() {
@@ -125,7 +126,7 @@ sed -i "s/{EMAIL_PASSWORD}/${email_password}/g" "${dest_settings}"
 
 # Update virtualenv
 if [ ! -e "${virtualenv_dir}/bin/pip" ]; then
-    python3.6 -m venv "${virtualenv_dir}"  >> ${log_file}
+    python3 -m venv "${virtualenv_dir}"  >> ${log_file}
 fi
 "${virtualenv_dir}/bin/pip" \
     install -r "${source_dir}/requirements.txt"  \
