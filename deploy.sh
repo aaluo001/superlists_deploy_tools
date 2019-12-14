@@ -127,8 +127,12 @@ sed -i "s/{EMAIL_PASSWORD}/${email_password}/g" "${dest_settings}"
 if [ ! -e "${virtualenv_dir}/bin/pip" ]; then
     python3 -m venv "${virtualenv_dir}"  >> ${log_file}
 fi
+
+# Install softwares used pypi.douban.com
 "${virtualenv_dir}/bin/pip" \
-    install -r "${source_dir}/requirements.txt"  \
+    install -r "${source_dir}/requirements.txt" \
+    -i http://pypi.douban.com/simple \
+    --trusted-host pypi.douban.com \
     >> ${log_file}
 
 

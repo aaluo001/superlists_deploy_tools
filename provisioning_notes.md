@@ -23,7 +23,7 @@
     Welcome to nginx!
 ## 安装Python3.6
     sudo apt install python3.6
-    sudo apt install python3.6-venv
+    sudo apt-get install python3.6-venv
     which python3
     python3 --version
 ## 安装Git
