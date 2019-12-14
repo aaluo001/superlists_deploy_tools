@@ -21,18 +21,11 @@ function display_usage_and_exit() {
     exit 1     
 }
 
-
-declare -r repo_url="https://github.com/aaluo001/superlists.git"
-declare -r date_str=`date +%Y%m%d`
-declare -r log_file="/root/deploy_tools/logs/deploy_${date_str}.log"
-declare -r shells_dir="/root/shells"
-
-
-# Include common shell
+# Include email_password
 . ${shells_dir}/init_common.sh
 
-
 # Set sitename
+# Include db_name, db_user and db_password
 case $1 in
     staging)
         declare -r sitename="www.tjw-superlists-staging.site"
@@ -46,7 +39,6 @@ case $1 in
         display_usage_and_exit
         ;;
 esac
-
 
 # Set config_nginx and config_gunicorn
 shift
@@ -67,16 +59,14 @@ do
 done
 
 
-# Start deploy
-echo "===================="     >> ${log_file}
-echo "deploy: ${sitename}"      >> ${log_file}
-date                            >> ${log_file}
-echo "===================="     >> ${log_file}
+# Declare columns
+declare -r repo_url="https://github.com/aaluo001/superlists.git"
+declare -r date_str=`date +%Y%m%d`
+declare -r log_file="${HOME}/deploy_tools/logs/deploy_${date_str}.log"
+declare -r shells_dir="${HOME}/shells"
 
-
-# Create directory structure
-declare -r keys_dir="/root/keys"
-declare -r site_dir="/root/sites/${sitename}"
+declare -r keys_dir="${HOME}/keys"
+declare -r site_dir="${HOME}/sites/${sitename}"
 
 declare -r database_dir="${site_dir}/database"
 declare -r source_dir="${site_dir}/source"
@@ -84,6 +74,7 @@ declare -r static_dir="${site_dir}/static"
 declare -r virtualenv_dir="${site_dir}/virtualenv"
 declare -r log_dir="${site_dir}/log"
 
+# Create directory structure
 mkdir -p "${keys_dir}"
 mkdir -p "${database_dir}"
 mkdir -p "${source_dir}"
@@ -91,6 +82,12 @@ mkdir -p "${static_dir}"
 mkdir -p "${virtualenv_dir}"
 mkdir -p "${log_dir}"
 
+
+# Start deploy
+echo "===================="     >> ${log_file}
+echo "deploy: ${sitename}"      >> ${log_file}
+date                            >> ${log_file}
+echo "===================="     >> ${log_file}
 
 # Get latest source
 if [ -e "${source_dir}/.git" ]; then
@@ -111,7 +108,7 @@ declare -r secret_key=`cat ${secret_key_file}`
 
 
 # Update settings
-declare -r temp_dir="/root/deploy_tools/templates"
+declare -r temp_dir="${HOME}/deploy_tools/templates"
 declare -r dest_settings="${source_dir}/superlists/settings.py"
 
 cp -pf "${temp_dir}/settings.py" "${dest_settings}"
@@ -156,6 +153,7 @@ if [ -n "${config_site}" ] || [ -n "${config_nginx}" ]; then
     sed -i "s/{SITENAME}/${sitename}/g" "${dest_nginx_conf}"
     if [ ! -L "${dest_nginx_ln}" ]; then
         ln -s "${dest_nginx_conf}" "${dest_nginx_ln}"
+        rm -f /etc/nginx/sites-enabled/default
     fi
 
     # Reload nginx
