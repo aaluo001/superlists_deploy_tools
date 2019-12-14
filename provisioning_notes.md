@@ -108,10 +108,14 @@ ${HOME}
         declare -r db_password="dev001#"
 
 ## 克隆deploy_tools
+    su - root
     cd ~
     git clone https://github.com/aaluo001/superlists_deploy_tools.git ./deploy_tools
 
-
+## 配布staging
+    su - root
+    cd deploy_tools
+    ./deploy.sh staging -g -c
 
 
 ## 配置Nginx
