@@ -128,6 +128,12 @@ if [ ! -e "${virtualenv_dir}/bin/pip" ]; then
     python3 -m venv "${virtualenv_dir}"  >> ${log_file}
 fi
 
+# Upgrade pip
+"${virtualenv_dir}/bin/pip" \
+    install --upgrade pip \
+    -i http://pypi.douban.com/simple \
+    --trusted-host pypi.douban.com \
+
 # Install softwares used pypi.douban.com
 "${virtualenv_dir}/bin/pip" \
     install -r "${source_dir}/requirements.txt" \

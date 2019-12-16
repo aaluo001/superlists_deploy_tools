@@ -41,7 +41,8 @@
 * 进入数据库
     psql
 * 创建测试用户dev001
-    CREATE ROLE dev001 LOGIN PASSWORD 'dev001#' CREATEDB; 
+    CREATE ROLE dev001 LOGIN PASSWORD 'dev001#' CREATEDB;
+    <!-- CREATE ROLE root LOGIN PASSWORD 'root1755#' CREATEDB; -->
 * 创建和用户名同名的数据库
     CREATE DATABASE dev001 WITH OWNER = dev001;
 * 查看配置文件路径
@@ -70,11 +71,23 @@
     修改后：
     #--------------------------------------------------------------------------------
     # "local" is for Unix domain socket connections only
+    <!-- local   dev001          root                                    peer -->
     local   all             all                                     md5    
     #--------------------------------------------------------------------------------
 
 * 重启postgresql
     service postgresql restart
+
+<!-- * 注意：
+    为了让root用户可以访问数据库dev001而不需要密码，将其设置为peer。
+    由于数据库dev001属于用dev001所有，那么需要dev001的用户赋予root用户操作表的权限。
+    那么，首先在Linux系统中必须添加dev001用户。(如果有该用户，就不需要了)
+    useradd -m dev001
+    passwd dev001
+    使用dev001用户登录，执行psql就能直接进入数据库。
+    赋予root用户操作所有表的权限：
+    dev001=> GRANT ALL ON ALL TABLES IN SCHEMA public TO root; -->
+
 
 
 ## 目录结构
@@ -117,7 +130,13 @@ ${HOME}
     cd deploy_tools
     ./deploy.sh staging -g -c
 
+## 为新发布打上Git标签
+git tag -f LIVE
+export TAG=`date +DEPLOY-%F/%H%M`
+git tag $TAG
+git push -f origin LIVE $TAG
 
+<!-- 
 ## 配置Nginx
 * 参考template_nginx.conf
 * 把{SITENAME}替换成所需的域名，如staging.my-domain.com
@@ -132,9 +151,4 @@ ${HOME}
 * 把{SITENAME}替换成所需的域名，如staging.my-domain.com
     cp -p ./template_gunicorn-systemd.service > /etc/systemd/system/staging.my-domain.com.service
     sed -i "s/{SITENAME}/staging.my-domain.com/g" /etc/systemd/system/staging.my-domain.com.service
-
-## 为新发布打上Git标签
-git tag -f LIVE
-export TAG=`date +DEPLOY-%F/%H%M`
-git tag $TAG
-git push -f origin LIVE $TAG
+-->
