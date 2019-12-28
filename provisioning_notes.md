@@ -131,10 +131,17 @@ ${HOME}
     ./deploy.sh staging -g -c
 
 ## 为新发布打上Git标签
-git tag -f LIVE
-export TAG=`date +DEPLOY-%F/%H%M`
-git tag $TAG
-git push -f origin LIVE $TAG
+    git tag -f LIVE
+    export TAG=`date +DEPLOY-%F/%H%M`
+    git tag $TAG
+    git push -f origin LIVE $TAG
+
+## 升级pip程序
+    pip install --upgrade pip -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+
+## 修复pip程序
+    python -m ensurepip
+    python -m pip install --upgrade pip -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 
 <!-- 
 ## 配置Nginx

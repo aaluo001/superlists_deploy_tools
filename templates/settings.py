@@ -149,6 +149,12 @@ EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 
 
+# Set Login successed redirect url
+# LOGIN_REDIRECT_URL = "home_page"
+# Set Logout successed redirect url
+LOGOUT_REDIRECT_URL = "home_page"
+
+
 # Set logging
 LOGGING = {
     'version': 1.0,
